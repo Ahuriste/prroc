@@ -176,8 +176,9 @@ function plot_mixture (){
     const roc2 = compute_roc(positive_samples_2, negative_samples_2);
     tpr_ = roc1.tpr[0] + mixture * (roc2.tpr[0] - roc1.tpr[0]); 
     fpr_ = roc1.fpr[0] + mixture * (roc2.fpr[0] - roc1.fpr[0]); 
-
+    precision = (tpr_ * p_split) / (tpr_*p_split + fpr_*(1-p_split))
     Plotly.restyle(ROC, {x: [[fpr_]] , y: [[tpr_]]}, [2]); 
+    Plotly.restyle(PR, {x: [[tpr_]] , y: [[precision]]}, [2]); 
 }
 function regenerate_samples (){
     positive_samples = generateSample(-1.0, 0.90);
@@ -186,7 +187,7 @@ function regenerate_samples (){
     negative_samples_2 = addRandomNoise (negative_samples, -max_noise);
     
 }
-
+let p_split = 0.9;
 let max_noise = 0.4;
 const n = 70;
 let threshold = 0.7;
