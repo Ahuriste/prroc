@@ -55,7 +55,7 @@ function plot_pr() {
 		r.push(metrics_.recall);
 	}
 
-	Plotly.newPlot(PR, [{x: r, y: p, name: 'classifier 1'}, {x: [], y: [], name: 'classifier 2'},{x: [], y: [], name: 'classifier 3'}], {
+	Plotly.newPlot(PR, [{x: r, y: p, name: 'classifier 1', marker:{size:10}}, {x: [], y: [], name: 'classifier 2', marker:{size:10}},{x: [], y: [], marker:{size:10},name: 'classifier 3'},{x:[], y:[], line:{color:'grey', dash:'dash'}}], {
 		margin: {t: 0}, title: 'Precision-Recall Curve',
 		xaxis: {title: 'Recall', range: [0, 1.05]},
 		yaxis: {title: 'Precision', range: [0, 1.1]},
@@ -78,7 +78,7 @@ function plot_roc() {
 		fnr.push(metrics_.fp / n);
 	}
 
-	Plotly.newPlot(ROC, [{x: fnr, y: tpr, name: 'classifier 1'}, {x: [], y: [], name: 'classifier 2'},{x: [], y: [], name: 'classifier 3'}], {
+	Plotly.newPlot(ROC, [{x: fnr, y: tpr, name: 'classifier 1',marker:{size:10}}, {x: [], y: [], name: 'classifier 2',marker:{size:10}},{x: [], y: [], name: 'classifier 3',marker:{size:10}}, {x:[], y:[], line:{color:'grey', dash:'dash'}}], {
 		title: 'ROC curve',
 		xaxis: {title: 'False Positive Rate (FPR)', range: [0, 1.05]},
 		yaxis: {title: 'True Positive Rate (TPR)', range: [0, 1.1]}, margin: {t: 0},
@@ -125,6 +125,23 @@ function replot_pr() {
 
     Plotly.restyle(PR, {x: [pr1.r], y: [pr1.p]}, [0]);
     Plotly.restyle(PR, {x: [pr2.r], y: [pr2.p]}, [1]);
+    
+
+    const m1 = compute_roc(positive_samples, negative_samples);
+    const m2 = compute_roc(positive_samples_2, negative_samples_2);
+
+    let tprs = [];
+    let precisions = [];
+    for (let i = 0; i <= 100; i++){
+        let mix = i/100
+        tpr_ = m1.tpr[0] + mix * (m2.tpr[0] - m1.tpr[0]); 
+        fpr_ = m1.fpr[0] + mix * (m2.fpr[0] - m1.fpr[0]); 
+
+        precision = (tpr_ * p_split) / (tpr_*p_split + fpr_*(1-p_split))
+        tprs.push (tpr_);
+        precisions.push (precision)
+    }
+    Plotly.restyle (PR, {x: [tprs],y: [precisions]}, [3]);
 }
 
 function replot_roc_ (){
@@ -165,6 +182,17 @@ function replot_roc() {
 
     Plotly.restyle(ROC, {x: [roc1.fpr], y: [roc1.tpr]}, [0]);  
     Plotly.restyle(ROC, {x: [roc2.fpr], y: [roc2.tpr]}, [1]); 
+
+    let tprs = [];
+    let fprs = [];
+    for (let i = 0; i <= 100; i++){
+        let mix = i/100
+        tpr_ = roc1.tpr[0] + mix * (roc2.tpr[0] - roc1.tpr[0]); 
+        fpr_ = roc1.fpr[0] + mix * (roc2.fpr[0] - roc1.fpr[0]); 
+        fprs.push (fpr_);
+        tprs.push (tpr_);
+    }
+    Plotly.restyle (ROC, {x: [fprs],y: [tprs]}, [3]);
 }
 
 
@@ -187,7 +215,7 @@ function regenerate_samples (){
     negative_samples_2 = addRandomNoise (negative_samples, -max_noise);
     
 }
-let p_split = 0.9;
+let p_split = 1/2;
 let max_noise = 0.4;
 const n = 70;
 let threshold = 0.7;
@@ -199,11 +227,11 @@ positive_samples_2 = addRandomNoise (positive_samples, max_noise);
 negative_samples_2 = addRandomNoise (negative_samples, -max_noise);
 regenerate_samples ();
 
-positive_samples = [0.9,0.8,0.9,0.9,0.9,0.8];
-negative_samples = [0.75,0.75,0.75,0.75,0,0];
+positive_samples = [0.9,0.8,0.9,0.9,0.9,0.8, 1, 1, 1, 1, 1, 1];
+negative_samples = [0.75,0.75,0.75,0.75,0,0,0, 0, 0.8, 0.8, 0.8, 0.8];
 
-positive_samples_2  = [0.8,0.8,0.5,0.5,0.4,0.5];
-negative_samples_2 = [0.05,0.05,0.075,0.075,0,0.075];
+positive_samples_2  = [0.8,0.8,0.5,0.5,0.4,0.5,0.5, 1, 1, 1, 1, 1];
+negative_samples_2 = [0.05,0.05,0.075,0.075,0,0.075,0.8, 0,0,0,0,0];
 const PR = document.querySelector('#PR');
 
 const ROC = document.querySelector('#ROC');

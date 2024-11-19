@@ -20,6 +20,7 @@ function createRange(start, end) {
 function metrics(threshold, positive, negative) {
 	let tp = 0;
 	let fp = 0;
+    let tn=0;
 	let function_ = 0;
 	for (const element of positive) {
 		if (element >= threshold) {
@@ -32,11 +33,13 @@ function metrics(threshold, positive, negative) {
 	for (const element of negative) {
 		if (element >= threshold) {
 			fp++;
-		}
+		}else{
+            tn ++;
+        }
 	}
 
 	return {
-		precision: tp / (tp + fp || 1), recall: tp / (tp + function_ || 1), tp, fp, fn: function_,
+        precision: tp / (tp + fp || 1), recall: tp / (tp + function_ || 1), tp, fp, fn: function_, tn
 	};
 }
 
@@ -174,6 +177,14 @@ function regenerate_samples (){
     
 }
 
+function update_confusion (){
+
+	const metrics_ = metrics(threshold, positive_samples, negative_samples);
+    document.querySelector("#tp").innerText = "TP : " +  metrics_.tp;
+    document.querySelector("#fp").innerText = "FP : " +  metrics_.fp;
+    document.querySelector("#tn").innerText = "TN : " +  metrics_.tn;
+    document.querySelector("#fn").innerText = "FN : " +  metrics_.fn;
+}
 const n = 70;
 let threshold = 0.8;
 const n_range = createRange(0, n);
@@ -186,11 +197,13 @@ const samples = document.querySelector('#samples');
 plot_pr();
 plot_roc();
 plot_samples(threshold);
-replot_samples(0.8);
+replot_samples(threshold);
+update_confusion();
 document.querySelector('#samples').on('plotly_sliderchange', eventData => {
 	const sliderValue = eventData.step.args[0];
 	replot_samples(sliderValue);
     threshold = sliderValue;
+    update_confusion();
 });
 document.querySelector('#samples').on('plotly_buttonclicked', eventData => {
     regenerate_samples();
