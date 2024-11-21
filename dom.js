@@ -55,7 +55,7 @@ function plot_pr() {
 		r.push(metrics_.recall);
 	}
 
-	Plotly.newPlot(PR, [{x: r, y: p, name: 'classifier 1'}, {x: [], y: [], name: 'classifier 2'}], {
+	Plotly.newPlot(PR, [{x: r, y: p, name: 'classifier 2'}, {x: [], y: [], name: 'classifier 1'}], {
 		margin: {t: 0}, title: 'Precision-Recall Curve',
 		xaxis: {title: 'Recall', range: [0, 1.05]},
 		yaxis: {title: 'Precision', range: [0, 1.1]},
@@ -78,7 +78,7 @@ function plot_roc() {
 		fnr.push(metrics_.fp / n);
 	}
 
-	Plotly.newPlot(ROC, [{x: fnr, y: tpr, name: 'classifier 1'}, {x: [], y: [], name: 'classifier 2'}], {
+	Plotly.newPlot(ROC, [{x: fnr, y: tpr, name: 'classifier 2'}, {x: [], y: [], name: 'classifier 1'}], {
 		title: 'ROC curve',
 		xaxis: {title: 'False Positive Rate (FPR)', range: [0, 1.05]},
 		yaxis: {title: 'True Positive Rate (TPR)', range: [0, 1.1]}, margin: {t: 0},
